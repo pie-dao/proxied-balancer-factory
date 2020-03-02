@@ -1,4 +1,6 @@
-import { BuidlerConfig, usePlugin } from "@nomiclabs/buidler/config";
+import { BuidlerConfig, usePlugin, task } from "@nomiclabs/buidler/config";
+import { PProxiedBalancerFactoryFactory } from "./typechain/PProxiedBalancerFactoryFactory";
+import { PBPoolOverridesFactory } from "./typechain/PBPoolOverridesFactory";
 
 usePlugin("@nomiclabs/buidler-waffle");
 usePlugin("@nomiclabs/buidler-etherscan");
@@ -39,5 +41,25 @@ const config: ExtendedBuidlerConfig = {
     target: "ethers"
   }
 };
+
+task("deploy-overrides", "deploys the overrides contract")
+  .setAction(async (taskArgs, { ethers }) => {
+    const signer = (await ethers.getSigners())[0];
+    const factory = new PBPoolOverridesFactory(signer);
+    const contract = await factory.deploy();
+
+    console.log(`Deployed overrides at: ${contract.address}`);
+  });
+
+task("deploy-factory", "deploys the proxied balancer pool factory")
+  .addParam("factory", "The address of the Balancer factory contract")
+  .addParam("overrides", "The address of the overrides contract")
+  .setAction(async (taskArgs, { ethers }) => {
+    const signer = (await ethers.getSigners())[0];
+    const factory = new PProxiedBalancerFactoryFactory(signer);
+
+    const contract = await factory.deploy(taskArgs.overrides, taskArgs.factory);
+    console.log(`Deployed proxied pool factory at: ${contract.address}`);
+});
 
 export default config;
