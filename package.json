@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pie-dao/pie-proxy.git"
+    "url": "git+https://github.com/pie-dao/proxied-balancer-factory.git"
   },
-  "author": "rhlsthrm",
+  "author": "Pie DAO",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pie-dao/pie-proxy/issues"
+    "url": "https://github.com/pie-dao/proxied-balancer-factory/issues"
   },
-  "homepage": "https://github.com/pie-dao/pie-proxy#readme",
+  "homepage": "https://github.com/pie-dao/proxied-balancer-factory/readme",
   "devDependencies": {
     "@nomiclabs/buidler": "^1.1.2",
     "@nomiclabs/buidler-ethers": "^1.1.2",
