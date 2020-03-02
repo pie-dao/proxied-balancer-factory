@@ -1,18 +1,26 @@
 pragma solidity ^0.6.2;
 
+import "./PBPoolOverrides.sol";
 import "./interfaces/IBFactory.sol";
 import "./interfaces/IBPool.sol";
-import "./PBPoolOverrides.sol";
 import "@pie-dao/proxy/contracts/PProxyOverrideablePausable.sol";
 
 
 contract PProxiedBalancerFactory {
 
+    // Balancer factory storage
+    mapping(address=>bool) private _isBPool;
+    address private _blabs;
+
+
     address public template;
     address public overrides;
 
-    constructor(address _bFactory, address _overrides) public {
-        template = IBFactory(_bFactory).newBPool();
+    constructor(address _overrides, address _bFactory) public {
+        // Create new template pool using delegatecall to properly setup the constructor args
+        bytes memory result;
+        (, result) = _bFactory.delegatecall(abi.encodeWithSignature("newBPool()"));
+        template = abi.decode(result, (address));
         overrides = _overrides;
     }
 

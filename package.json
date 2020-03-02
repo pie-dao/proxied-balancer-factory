@@ -41,7 +41,8 @@
     "typescript": "^3.7.5"
   },
   "dependencies": {
-    "@pie-dao/proxy": "^0.0.5"
+    "@pie-dao/proxy": "^0.0.5",
+    "balancer-core": "https://github.com/balancer-labs/balancer-core"
   },
   "directories": {
     "test": "test"
