@@ -1,30 +1,31 @@
 pragma solidity ^0.6.2;
 
 import "./PBPoolOverrides.sol";
-import "./interfaces/IBFactory.sol";
 import "./interfaces/IBPool.sol";
 import "@pie-dao/proxy/contracts/PProxyOverrideablePausable.sol";
 
 
 contract PProxiedBalancerFactory {
 
-    // Balancer factory storage
     mapping(address=>bool) private _isBPool;
-    address private _blabs;
+    address[] public bPools;
 
 
     address public template;
     address public overrides;
 
-    constructor(address _overrides, address _bFactory) public {
+    event LOG_NEW_POOL(
+        address indexed caller,
+        address indexed pool
+    );
+
+    constructor(address _overrides, address _template) public {
         // Create new template pool using delegatecall to properly setup the constructor args
-        bytes memory result;
-        (, result) = _bFactory.delegatecall(abi.encodeWithSignature("newBPool()"));
-        template = abi.decode(result, (address));
+        template = _template;
         overrides = _overrides;
     }
 
-    function newProxiedPool(string calldata _name, string calldata _symbol) external {
+    function newProxiedPool(string calldata _name, string calldata _symbol) external returns(address) {
         // DEPLOY Proxy contract
         PProxyOverrideablePausable proxy = new PProxyOverrideablePausable();
         // Set implementation to proxy contract
@@ -37,6 +38,17 @@ contract PProxiedBalancerFactory {
         proxy.setProxyOwner(msg.sender);
         // Set controller
         IBPool(address(proxy)).setController(msg.sender);
+        _isBPool[address(proxy)] = true;
+        bPools.push(address(proxy));
+        emit LOG_NEW_POOL(msg.sender, address(proxy));
+        return(address(proxy));
     }
+
+    function isBPool(address b)
+        external view returns (bool)
+    {
+        return _isBPool[b];
+    }
+
 
 }
